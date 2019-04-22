@@ -1,0 +1,14 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head> 
+    <title>Weather application: Search weather for a location</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<h1>Result</h1>
+    <p th:text="'Location: ' + ${location.name}"></p>
+    <p th:text="'Weather service provider: ' + ${weather != null ? weather.weatherServiceName : 'No forecast found for ' + location.name}"></p>
+    <p th:text="'Current temperature: ' + ${weather != null ? weather.currentTemperature : '-'}"></p>
+    <a href="/weather">Do another search</a>
+</body>
+</html>
