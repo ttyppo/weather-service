@@ -82,7 +82,7 @@ public class WeatherAPIControllerIT {
                 equalToIgnoringCase("FMI (Ilmatieteenlaitos)"));
         assertThat(response.getBody().getWeatherForecast().getLocation().getName(),
                 equalToIgnoringCase("Some Town"));
-        assertThat(response.getBody().getWeatherForecast().getCurrentTemperature(),
+        assertThat(response.getBody().getWeatherForecast().getCurrentWeather().getTemperature().toString(),
                 equalToIgnoringCase("3.51"));
     }
 }

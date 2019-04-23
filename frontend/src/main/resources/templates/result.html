@@ -3,12 +3,25 @@
 <head> 
     <title>Weather application: Search weather for a location</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="css/weather.css">
 </head>
 <body>
 	<h1>Result</h1>
     <p th:text="'Location: ' + ${location.name}"></p>
     <p th:text="'Weather service provider: ' + ${weather != null ? weather.weatherServiceName : 'No forecast found for ' + location.name}"></p>
-    <p th:text="'Current temperature: ' + ${weather != null ? weather.currentTemperature : '-'}"></p>
+    <table>
+        <tr>
+            <td>
+                <p th:text="'Current weather'"></p>
+            </td>
+            <td>
+                <p th:text="${weather != null ? weather.currentWeather.temperature + ' °C ': 'Not available'}"></p>
+            </td>
+            <td>
+                <img th:src="${weather != null ? 'symbols/' + weather.currentWeather.iconId + '.svg' : ''}"/>
+            </td>
+        </tr>
+    </table>
     <a href="/weather">Do another search</a>
 </body>
 </html>

@@ -12,6 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 import ttyppo.weatherservice.model.Location;
+import ttyppo.weatherservice.model.WeatherCondition;
 import ttyppo.weatherservice.model.WeatherForecast;
 import ttyppo.weatherservice.model.WeatherResponse;
 
@@ -46,8 +47,11 @@ public class WeatherControllerTests {
         // given
         Location location = new Location();
         location.setName("Some Town");
+        WeatherCondition currentWeather = new WeatherCondition();
+        currentWeather.setIconId(1);
+        currentWeather.setTemperature(21.4f);
         WeatherForecast forecast = new WeatherForecast();
-        forecast.setCurrentTemperature("21.4");
+        forecast.setCurrentWeather(currentWeather);
         forecast.setWeatherServiceName("Test weather service");
         WeatherResponse response = new WeatherResponse();
         response.setWeatherForecast(forecast);
@@ -59,7 +63,9 @@ public class WeatherControllerTests {
                 .andExpect(content().string(containsString("Result")))
                 .andExpect(content().string(containsString("Location: Some Town")))
                 .andExpect(content().string(containsString("Weather service provider: Test weather service")))
-                .andExpect(content().string(containsString("Current temperature: 21.4")));
+                .andExpect(content().string(containsString("Current weather")))
+                .andExpect(content().string(containsString("21.4 °C")))
+                .andExpect(content().string(containsString("symbols/1.svg")));
     }
 
 }

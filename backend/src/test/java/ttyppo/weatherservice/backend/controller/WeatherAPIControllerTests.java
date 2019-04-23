@@ -16,6 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import ttyppo.weatherservice.backend.model.WeatherServices;
 import ttyppo.weatherservice.backend.model.WeatherService;
+import ttyppo.weatherservice.model.WeatherCondition;
 import ttyppo.weatherservice.model.WeatherForecast;
 
 import java.util.Collections;
@@ -40,10 +41,13 @@ public class WeatherAPIControllerTests {
     @Test
     public void jsonBodyWeatherShouldReturnWeatherForecast() throws Exception {
         List<WeatherService> testWeatherServiceList = Collections.singletonList(location -> {
+            WeatherCondition currentWeather = new WeatherCondition();
+            currentWeather.setIconId(1);
+            currentWeather.setTemperature(21.1f);
             WeatherForecast forecast = new WeatherForecast();
             forecast.setWeatherServiceName("Test weather API service");
             forecast.setLocation(location);
-            forecast.setCurrentTemperature("21.1");
+            forecast.setCurrentWeather(currentWeather);
             return forecast;
         });
         Mockito.when(weatherServices.getServiceProviders()).thenReturn(testWeatherServiceList);
@@ -52,7 +56,8 @@ public class WeatherAPIControllerTests {
                 .andExpect(jsonPath("$.weatherForecast.weatherServiceName")
                         .value("Test weather API service"))
                 .andExpect(jsonPath("$.weatherForecast.location.name").value("Some Town"))
-                .andExpect(jsonPath("$.weatherForecast.currentTemperature").value("21.1"));
+                .andExpect(jsonPath("$.weatherForecast.currentWeather.iconId").value("1"))
+                .andExpect(jsonPath("$.weatherForecast.currentWeather.temperature").value("21.1"));
     }
 
     @Test

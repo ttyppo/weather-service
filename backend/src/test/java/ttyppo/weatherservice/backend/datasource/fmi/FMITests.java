@@ -12,24 +12,23 @@ import ttyppo.weatherservice.model.WeatherForecast;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FMITests {
 
     @Test
     public void weatherForecastShouldBeFetchedOK() throws Exception {
         // given
-        String temperature = "22.1";
+        Float temperature = 22.1f;
+        Integer weatherSymbol = 1;
         Location location = new Location();
         location.setName("Some Town");
-        BsWfsElement bsWfsElement = new BsWfsElement();
-        bsWfsElement.setParameterValue(temperature);
-        bsWfsElement.setParameterName("Temperature");
-        bsWfsElement.setTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        Member member = new Member();
-        member.setBsWfsElement(bsWfsElement);
+        List<Member> members = new ArrayList<>();
+        members.add(getMember("Temperature", temperature.toString()));
+        members.add(getMember("WeatherSymbol3", weatherSymbol.toString()));
         FeatureCollection featureCollection = new FeatureCollection();
-        featureCollection.setMember(Collections.singletonList(member));
+        featureCollection.setMember(members);
         RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         String hostname = "http://localhost";
 
@@ -44,21 +43,22 @@ public class FMITests {
         assertNotNull(forecast);
         assertEquals(forecast.getWeatherServiceName(), FMI.DISPLAY_NAME);
         assertEquals(forecast.getLocation().getName(), location.getName());
-        assertEquals(forecast.getCurrentTemperature(), temperature);
+        assertEquals(forecast.getCurrentWeather().getTemperature(), temperature);
+        assertEquals(forecast.getCurrentWeather().getIconId(), weatherSymbol.intValue());
     }
 
     @Test
     public void shouldReturnNullIfRestClientException() throws Exception {
         // given
         String temperature = "22.1";
+        Integer weatherSymbol = 1;
         Location location = new Location();
         location.setName("Some Town");
-        BsWfsElement bsWfsElement = new BsWfsElement();
-        bsWfsElement.setParameterValue(temperature);
-        Member member = new Member();
-        member.setBsWfsElement(bsWfsElement);
+        List<Member> members = new ArrayList<>();
+        members.add(getMember("Temperature", temperature.toString()));
+        members.add(getMember("WeatherSymbol3", weatherSymbol.toString()));
         FeatureCollection featureCollection = new FeatureCollection();
-        featureCollection.setMember(Collections.singletonList(member));
+        featureCollection.setMember(members);
         RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         String hostname = "http://localhost";
 
@@ -71,5 +71,19 @@ public class FMITests {
 
         // then
         assertNull(forecast);
+    }
+
+    private Member getMember(String parameterName, String parameterValue) {
+        Member member = new Member();
+        member.setBsWfsElement(getBsWfsElement(parameterName, parameterValue));
+        return member;
+    }
+
+    private BsWfsElement getBsWfsElement(String parameterName, String parameterValue) {
+        BsWfsElement bsWfsElement = new BsWfsElement();
+        bsWfsElement.setParameterName(parameterName);
+        bsWfsElement.setParameterValue(parameterValue);
+        bsWfsElement.setTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        return bsWfsElement;
     }
 }

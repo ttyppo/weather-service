@@ -4,7 +4,7 @@ public class WeatherForecast {
 
     private String weatherServiceName;
     private Location location;
-    private String currentTemperature;
+    private WeatherCondition currentWeather;
 
     public String getWeatherServiceName() {
         return weatherServiceName;
@@ -22,11 +22,11 @@ public class WeatherForecast {
         this.location = location;
     }
 
-    public String getCurrentTemperature() {
-        return currentTemperature;
+    public WeatherCondition getCurrentWeather() {
+        return currentWeather;
     }
 
-    public void setCurrentTemperature(String currentTemperature) {
-        this.currentTemperature = currentTemperature;
+    public void setCurrentWeather(WeatherCondition currentWeather) {
+        this.currentWeather = currentWeather;
     }
 }
