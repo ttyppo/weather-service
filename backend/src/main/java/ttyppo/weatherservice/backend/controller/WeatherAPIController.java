@@ -7,8 +7,8 @@ import ttyppo.weatherservice.model.WeatherForecast;
 import ttyppo.weatherservice.model.WeatherRequest;
 import ttyppo.weatherservice.model.WeatherResponse;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 public class WeatherAPIController {
@@ -21,22 +21,17 @@ public class WeatherAPIController {
 
     @PostMapping("/weather/api")
     public WeatherResponse weatherAPI(@RequestBody WeatherRequest request) {
-        final List<WeatherForecast> forecasts = getWeatherForecasts(request.getLocation());
+        final Optional<WeatherForecast> forecasts = getWeatherForecast(request.getLocation());
         WeatherResponse response = new WeatherResponse();
-        if (forecasts.size() > 0) {
-            response.setWeatherForecast(forecasts.get(0));
-        }
+        response.setWeatherForecast(forecasts.orElse(null));
         return response;
     }
 
-    private List<WeatherForecast> getWeatherForecasts(final Location location) {
-        final List<WeatherForecast> forecasts = new ArrayList<>();
-        weatherServices.getServiceProviders().forEach(provider -> {
-                WeatherForecast forecast = provider.fetchForecast(location);
-                if (forecast != null) {
-                    forecasts.add(forecast);
-                }
-        });
-        return forecasts;
+    private Optional<WeatherForecast> getWeatherForecast(final Location location) {
+        return weatherServices.getServiceProviders()
+                .parallelStream()
+                .map(provider -> provider.fetchForecast(location))
+                .filter(Objects::nonNull)
+                .findAny();
     }
 }

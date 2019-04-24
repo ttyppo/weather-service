@@ -16,6 +16,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FMI implements WeatherService {
 
@@ -43,7 +44,7 @@ public class FMI implements WeatherService {
             forecast.setCurrentWeather(getCurrentWeather(location));
             forecast.setForecastConditions(getWeatherForecast(location));
             return forecast;
-        } catch (RestClientException | MissingParameterException | NumberFormatException e) {
+        } catch (RestClientException | NumberFormatException | MissingParameterException e) {
             log.error("Failed to fetch weather forecast!", e);
         }
         return null;
@@ -52,13 +53,14 @@ public class FMI implements WeatherService {
     private WeatherCondition getCurrentWeather(Location location) throws MissingParameterException {
         FeatureCollection featureCollection = restTemplate.getForObject(apiUrl, FeatureCollection.class,
                 getQueryParameters(location, 0, 1));
-        return featureCollection != null ? getWeatherConditions(featureCollection).get(0) : null;
+        return featureCollection == null ? null : getWeatherConditions(featureCollection)
+                .findFirst().orElseThrow(() -> new MissingParameterException("Failed to find current weather!"));
     }
 
     private List<WeatherCondition> getWeatherForecast(Location location) {
         FeatureCollection featureCollection = restTemplate.getForObject(apiUrl, FeatureCollection.class,
                 getQueryParameters(location, 5, 12 * 60));
-        return featureCollection != null ? getWeatherConditions(featureCollection) : null;
+        return featureCollection == null ? null : getWeatherConditions(featureCollection).collect(Collectors.toList());
     }
 
     private static Map<String, String> getQueryParameters(Location location, int daysForward, int intervalInMinutes) {
@@ -80,8 +82,8 @@ public class FMI implements WeatherService {
         return params;
     }
 
-    static List<WeatherCondition> getWeatherConditions(FeatureCollection featureCollection) {
-        return featureCollection.getMember().stream()
+    static Stream<WeatherCondition> getWeatherConditions(FeatureCollection featureCollection) {
+        return featureCollection.getMember().parallelStream()
                 .map(Member::getBsWfsElement)
                 .filter(element -> !element.getParameterValue().equals("NaN"))
                 .collect(Collectors.toMap(BsWfsElement::getTime, element -> {
@@ -102,8 +104,8 @@ public class FMI implements WeatherService {
                     mergedCondition.setTemperature(condition1.getTemperature() != null ?
                             condition1.getTemperature() : condition2.getTemperature());
                     return mergedCondition;
-                })).values().stream().sorted(Comparator.comparing(WeatherCondition::getTime))
-                .collect(Collectors.toList());
+                })).values().stream()
+                .sorted(Comparator.comparing(WeatherCondition::getTime));
     }
 
     public enum Parameters {

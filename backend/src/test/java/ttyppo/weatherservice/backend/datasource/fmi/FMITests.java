@@ -16,6 +16,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FMITests {
 
@@ -98,7 +99,8 @@ public class FMITests {
         featureCollection.setMember(members);
 
         // when
-        List<WeatherCondition> weatherConditions = FMI.getWeatherConditions(featureCollection);
+        List<WeatherCondition> weatherConditions = FMI.getWeatherConditions(featureCollection)
+                .collect(Collectors.toList());
 
         // expect
         assertNotNull(weatherConditions);
