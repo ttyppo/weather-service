@@ -6,21 +6,53 @@
     <link rel="stylesheet" type="text/css" href="css/weather.css">
 </head>
 <body>
-	<h1>Result</h1>
+	<h1 th:text="'Weather forecast'"></h1>
     <p th:text="'Location: ' + ${location.name}"></p>
-    <p th:text="'Weather service provider: ' + ${weather != null ? weather.weatherServiceName : 'No forecast found for ' + location.name}"></p>
+    <p th:if="${weather?.weatherServiceName != null}" th:text="'Weather service provider: ' + ${weather.weatherServiceName}"></p>
+    <p th:if="${weather?.weatherServiceName == null}" th:text="'Weather service provider: Not available'"></p>
     <table>
+        <thead>
         <tr>
+            <th>Current weather</th>
+            <th>Temperature</th>
+            <th>Weather Condition</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${weather?.currentWeather != null}">
             <td>
-                <p th:text="'Current weather'"></p>
+                <p th:text="${dateTimeFormatter.format(weather.currentWeather.time)}"></p>
             </td>
             <td>
-                <p th:text="${weather != null ? weather.currentWeather.temperature + ' °C ': 'Not available'}"></p>
+                <p th:text="${#numbers.formatDecimal(weather.currentWeather.temperature, 1, 1)} + ' °C '"></p>
             </td>
             <td>
-                <img th:src="${weather != null ? 'symbols/' + weather.currentWeather.iconId + '.svg' : ''}"/>
+                <img th:src="'symbols/' + ${weather.currentWeather.iconId} + '.svg'"/>
             </td>
         </tr>
+        </tbody>
+    </table>
+    <table>
+        <thead>
+        <tr>
+            <th>Forecast</th>
+            <th>Temperature</th>
+            <th>Weather Condition</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${weather?.forecastConditions != null}" th:each="condition : ${weather?.forecastConditions}">
+            <td>
+                <p th:text="${dateTimeFormatter.format(condition.time)}"></p>
+            </td>
+            <td>
+                <p th:text="${#numbers.formatDecimal(condition.temperature, 1, 1) + ' °C '}"></p>
+            </td>
+            <td align="center">
+                <img th:src="'symbols/' + ${condition.iconId} + '.svg'"/>
+            </td>
+        </tr>
+        </tbody>
     </table>
     <a href="/weather">Do another search</a>
 </body>

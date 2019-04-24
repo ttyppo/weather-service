@@ -1,15 +1,18 @@
 package ttyppo.weatherservice.model;
 
+import java.time.ZonedDateTime;
+
 public class WeatherCondition {
 
-    private int iconId;
+    private Integer iconId;
     private Float temperature;
+    private ZonedDateTime time;
 
-    public int getIconId() {
+    public Integer getIconId() {
         return iconId;
     }
 
-    public void setIconId(int iconId) {
+    public void setIconId(Integer iconId) {
         this.iconId = iconId;
     }
 
@@ -19,5 +22,13 @@ public class WeatherCondition {
 
     public void setTemperature(Float temperature) {
         this.temperature = temperature;
+    }
+
+    public ZonedDateTime getTime() {
+        return time;
+    }
+
+    public void setTime(ZonedDateTime time) {
+        this.time = time;
     }
 }

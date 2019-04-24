@@ -13,6 +13,6 @@ td, th {
     padding: 4px;
 }
 
-tr:nth-child(odd) {
+th, tr:nth-child(even) {
     background-color: #eeeeee;
 }

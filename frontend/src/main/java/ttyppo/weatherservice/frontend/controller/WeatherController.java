@@ -14,6 +14,10 @@ import ttyppo.weatherservice.model.WeatherForecast;
 import ttyppo.weatherservice.model.WeatherRequest;
 import ttyppo.weatherservice.model.WeatherResponse;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 @Controller
 public class WeatherController {
 
@@ -36,6 +40,10 @@ public class WeatherController {
     @PostMapping("/weather")
     public String weatherSubmit(Model model, @ModelAttribute Location location) {
         model.addAttribute("location", location);
+        model.addAttribute("dateTimeFormatter", DateTimeFormatter
+                .ofPattern("EEE dd.MM.yyyy HH:mm z")
+                .withLocale(Locale.ENGLISH)
+                .withZone(ZoneId.systemDefault()));
         WeatherRequest request = new WeatherRequest();
         request.setLocation(location);
         WeatherForecast forecast = null;

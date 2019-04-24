@@ -26,6 +26,6 @@ public class ApplicationTest {
         this.mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
                 .andExpect(forwardedUrl("index.html"));
         this.mockMvc.perform(get("/index.html")).andDo(print()).andExpect(status().isOk())
-                .andExpect(content().string(containsString("Search weather <a href=\"/weather\">here</a>")));
+                .andExpect(content().string(containsString("Start searching weather forecasts <a href=\"/weather\">here</a>")));
     }
 }

@@ -16,6 +16,9 @@ import ttyppo.weatherservice.model.WeatherCondition;
 import ttyppo.weatherservice.model.WeatherForecast;
 import ttyppo.weatherservice.model.WeatherResponse;
 
+import java.time.ZonedDateTime;
+import java.util.Collections;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -50,9 +53,15 @@ public class WeatherControllerTests {
         WeatherCondition currentWeather = new WeatherCondition();
         currentWeather.setIconId(1);
         currentWeather.setTemperature(21.4f);
+        currentWeather.setTime(ZonedDateTime.now());
+        WeatherCondition forecastWeather = new WeatherCondition();
+        forecastWeather.setIconId(2);
+        forecastWeather.setTemperature(22.4f);
+        forecastWeather.setTime(ZonedDateTime.now().plusDays(1));
         WeatherForecast forecast = new WeatherForecast();
         forecast.setCurrentWeather(currentWeather);
         forecast.setWeatherServiceName("Test weather service");
+        forecast.setForecastConditions(Collections.singletonList(forecastWeather));
         WeatherResponse response = new WeatherResponse();
         response.setWeatherForecast(forecast);
         Mockito.when(restTemplate.postForObject(eq(BACKEND_URL), any(), eq(WeatherResponse.class)))
@@ -60,12 +69,15 @@ public class WeatherControllerTests {
 
         //expect
         mockMvc.perform(post("/weather").param("name", "Some Town"))
-                .andExpect(content().string(containsString("Result")))
+                .andExpect(content().string(containsString("Weather forecast")))
                 .andExpect(content().string(containsString("Location: Some Town")))
                 .andExpect(content().string(containsString("Weather service provider: Test weather service")))
                 .andExpect(content().string(containsString("Current weather")))
                 .andExpect(content().string(containsString("21.4 °C")))
-                .andExpect(content().string(containsString("symbols/1.svg")));
+                .andExpect(content().string(containsString("symbols/1.svg")))
+                .andExpect(content().string(containsString("Forecast")))
+                .andExpect(content().string(containsString("22.4 °C")))
+                .andExpect(content().string(containsString("symbols/2.svg")));
     }
 
 }
